@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 import static org.apache.spark.sql.functions.col;
 
-public class GBDT {
+public class GBDTHackathon {
     public static void main(String[] args) {
         SparkSession spark = SparkSession
                 .builder()
@@ -37,9 +37,68 @@ public class GBDT {
         Dataset<Row> rawData = spark
                 .read()
                 .option("delimiter", "\t")
-                .option("header", "true")
+//                .option("header", "true")
                 .option("inferSchema", "true")
                 .csv("src/main/resources/pred_data_200.txt");
+
+        String[] cols = new String[]{
+                "log_id",
+                "user_id",
+                "restaurant_id",
+                "viewed_idx",
+                "day_no",
+                "avg_order_num",
+                "rst_order_price",
+                "click_rate",
+                "buy_rate",
+                "activity_cut_rate",
+                "brand_prefer_click",
+                "brand_prefer_order",
+                "cat_prefer_click",
+                "cat_prefer_order",
+                "click_num",
+                "deliver_rate_click",
+                "deliver_rate_order",
+                "hongbao_cut_rate",
+                "last_click_day",
+                "last_order_day",
+                "order_num",
+                "usr_order_price",
+                "shop_prefer_click",
+                "shop_prefer_order",
+                "order_price_rel",
+                "open_month_num",
+                "primary_category_cat",
+                "agent_fee",
+                "is_premium",
+                "good_rating_rate",
+                "has_image",
+                "has_food_img",
+                "min_deliver_amount",
+                "is_time_ensure",
+                "is_ka",
+                "is_time_ensure_discount",
+                "is_eleme_deliver",
+                "brand_name_cat",
+                "service_rating",
+                "public_degree",
+                "food_num",
+                "food_image_num",
+                "is_promotion_info",
+                "time_cat_rel",
+                "netword_type_cat",
+                "platform_cat",
+                "brand_cat",
+                "network_operator_cat",
+                "channel_cat",
+                "is_click",
+                "is_buy",
+        };
+
+        String[] rawCols = rawData.columns();
+        for(int i=0; i<rawCols.length; i++) {
+            rawData = rawData.withColumnRenamed(rawCols[i], cols[i]);
+        }
 
         Dataset<Row> data = rawData.filter(col("viewed_idx").lt(50));
         data.show(5);
@@ -92,7 +151,7 @@ public class GBDT {
 
         BinaryClassificationEvaluator evaluator = new BinaryClassificationEvaluator()
                 .setLabelCol("is_click")
-                .setRawPredictionCol("prediction")
+//                .setRawPredictionCol("prediction")
                 .setMetricName("areaUnderROC");
 
         CrossValidator cv = new CrossValidator()
